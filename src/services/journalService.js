@@ -127,11 +127,11 @@ export class JournalService {
     return { savedAttendance, savedMarks };
   }
 
-  static async downloadVedomost(lessonId) {
-    return this._downloadLessonDoc(
-      lessonId,
-      APP_CONSTANTS.ENDPOINTS_SUFFIX.DOWNLOAD_VEDOMOST,
-      APP_CONSTANTS.FILES.VEDOMOST_PREFIX,
+  static async downloadVedomost(groupId, subjectId, params = {}) {
+    return this._downloadDoc(
+      `${APP_CONSTANTS.API_ENDPOINTS.LESSONS}${APP_CONSTANTS.ENDPOINTS_SUFFIX.DOWNLOAD_VEDOMOST}`,
+      { group: groupId, subject: subjectId, ...params },
+      `${APP_CONSTANTS.FILES.VEDOMOST_PREFIX}${groupId}${APP_CONSTANTS.FILES.VEDOMOST_EXT}`,
     );
   }
 

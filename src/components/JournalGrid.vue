@@ -90,16 +90,6 @@
                 >
                 <div class="lesson-header-actions">
                   <Button
-                    icon="pi pi-file-word"
-                    text
-                    rounded
-                    size="small"
-                    class="mt-1 p-0 w-2rem h-2rem text-primary"
-                    :title="APP_CONSTANTS.UI.LABELS.DOWNLOAD_VEDOMOST_TITLE"
-                    :loading="downloadingVedomostIds.has(lesson.id)"
-                    @click.stop="downloadVedomost(lesson.id)"
-                  />
-                  <Button
                     icon="pi pi-pencil"
                     text
                     rounded
@@ -246,14 +236,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { APP_CONSTANTS } from "../config/constants";
 import { formatDate } from "../utils/dateUtils";
 import { getPersonFullName, formatTimeShort } from "../utils/journalUtils";
 import { useJournalStore } from "../store/journalStore";
 import { useInlineEdit } from "../composables/useInlineEdit";
 import { useJournalGrid } from "../composables/useJournalGrid";
-import { useNotify } from "../composables/useNotify";
 import { JournalService } from "../services/journalService";
 
 const props = defineProps({
@@ -278,7 +267,6 @@ const emit = defineEmits([
 ]);
 
 const journalStore = useJournalStore();
-const { notifySuccess } = useNotify();
 
 const {
   inlineMarkValue,
@@ -369,20 +357,6 @@ const getLessonTeachers = (teacherIds) => {
     .join(APP_CONSTANTS.FORMATTING.SEPARATOR);
 };
 
-const downloadVedomost = async (lessonId) => {
-  if (downloadingVedomostIds.value.has(lessonId)) return;
-  downloadingVedomostIds.value.add(lessonId);
-  try {
-    await JournalService.downloadVedomost(lessonId);
-    notifySuccess(APP_CONSTANTS.UI.NOTIFY.VEDOMOST_SAVED);
-  } catch (error) {
-    console.error(APP_CONSTANTS.UI.ERRORS.DOWNLOAD_VEDOMOST, error);
-    emit("error", error, APP_CONSTANTS.UI.ERRORS.DOWNLOAD_VEDOMOST);
-  } finally {
-    downloadingVedomostIds.value.delete(lessonId);
-  }
-};
-
 const downloadStudentCard = async (lessonId) => {
   try {
     await JournalService.downloadStudentCard(lessonId);
@@ -391,6 +365,4 @@ const downloadStudentCard = async (lessonId) => {
     emit("error", error, APP_CONSTANTS.UI.ERRORS.DOWNLOAD_STUDENT_CARD);
   }
 };
-
-const downloadingVedomostIds = ref(new Set());
 </script>

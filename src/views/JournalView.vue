@@ -9,8 +9,10 @@
         :groups="dictionaryStore.dicts.groups"
         :subjects="dictionaryStore.dicts.subjects"
         :downloading-roster="isDownloadingRoster"
+        :downloading-vedomost="isDownloadingVedomost"
         @add-lesson="showAddLessonModal = true"
         @download-roster="handleDownloadRoster"
+        @download-vedomost="showVedomostModal = true"
       />
 
       <div v-if="!selectedGroup || !selectedSubject" class="empty-state">
@@ -113,6 +115,13 @@
         @confirm="handleDeleteLesson"
       />
 
+      <VedomostModal
+        :visible="showVedomostModal"
+        :is-downloading="isDownloadingVedomost"
+        @update:visible="showVedomostModal = $event"
+        @download="handleDownloadVedomost"
+      />
+
       <HelpDialog
         :visible="showHelpDialog"
         :title="APP_CONSTANTS.UI.HELP.TITLE"
@@ -134,6 +143,7 @@ import JournalGrid from "../components/JournalGrid.vue";
 import CellModal from "../components/CellModal.vue";
 import AddLessonModal from "../components/AddLessonModal.vue";
 import DeleteLessonDialog from "../components/DeleteLessonDialog.vue";
+import VedomostModal from "../components/VedomostModal.vue";
 import HelpDialog from "../components/HelpDialog.vue";
 import ErrorDialog from "../components/ErrorDialog.vue";
 import { useJournalStore } from "../store/journalStore";
@@ -167,6 +177,8 @@ const journalGridRef = ref(null);
 const isSavingCell = ref(false);
 const isSavingLesson = ref(false);
 const isDownloadingRoster = ref(false);
+const showVedomostModal = ref(false);
+const isDownloadingVedomost = ref(false);
 
 const showDeleteDialog = ref(false);
 const deleteLessonLine = ref("");
@@ -317,6 +329,25 @@ const handleDownloadRoster = async () => {
     showError(error, APP_CONSTANTS.UI.ERRORS.DOWNLOAD_ROSTER);
   } finally {
     isDownloadingRoster.value = false;
+  }
+};
+
+const handleDownloadVedomost = async (params) => {
+  if (isDownloadingVedomost.value) return;
+  isDownloadingVedomost.value = true;
+  try {
+    await JournalService.downloadVedomost(
+      selectedGroup.value,
+      selectedSubject.value,
+      params,
+    );
+    showVedomostModal.value = false;
+    notifySuccess(APP_CONSTANTS.UI.NOTIFY.VEDOMOST_SAVED);
+  } catch (error) {
+    console.error("Failed to download vedomost:", error);
+    showError(error, APP_CONSTANTS.UI.ERRORS.DOWNLOAD_VEDOMOST);
+  } finally {
+    isDownloadingVedomost.value = false;
   }
 };
 

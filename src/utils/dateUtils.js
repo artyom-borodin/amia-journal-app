@@ -11,6 +11,25 @@ export const formatDate = (dateStr) => {
   }).format(d);
 };
 
+export const formatFullDate = (date) => {
+  if (!date) return "";
+  if (typeof date === "string") return date.trim();
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return "";
+
+  const day = String(d.getDate()).padStart(
+    APP_CONSTANTS.DATE_FORMAT.PAD_LENGTH,
+    APP_CONSTANTS.DATE_FORMAT.PAD_CHAR,
+  );
+  const month = String(d.getMonth() + 1).padStart(
+    APP_CONSTANTS.DATE_FORMAT.PAD_LENGTH,
+    APP_CONSTANTS.DATE_FORMAT.PAD_CHAR,
+  );
+  const year = d.getFullYear();
+
+  return `${day}.${month}.${year}`;
+};
+
 export const toApiDate = (date) => {
   if (!date) return "";
   const d = date instanceof Date ? date : new Date(date);
